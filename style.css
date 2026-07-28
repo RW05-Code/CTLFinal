@@ -1,12 +1,11 @@
 * {
     box-sizing: border-box;
 }
-
 body {
-    background-color: #f4f7fb;
-    margin: 0;
+    background-color:white;
+    margin:0;
     font-family: 'Poppins', sans-serif;
-    color: #1f2937;
+    color:black;
     line-height: 1.6;
 }
 
@@ -16,7 +15,7 @@ header {
     left: 0;
     right: 0;
     z-index: 1000;
-    background: linear-gradient(90deg, #111827, #1f2937);
+    background-color:black;
     padding: 14px 24px;
     width: 100%;
     display: flex;
@@ -55,7 +54,7 @@ header {
 
 .navbar a:hover,
 .navbar a.active {
-    background-color: rgba(255, 255, 255, 0.16);
+    background-color:gray;
     transform: translateY(-1px);
 }
 
@@ -65,41 +64,33 @@ header {
     padding: 28px 20px 48px;
 }
 
-.hero {
-    background: linear-gradient(135deg, #111827, #4f46e5);
-    color: white;
+.bub{
+    background-color:white;
+    color:black;
     border-radius: 24px;
     padding: 32px;
     box-shadow: 0 12px 30px rgba(79, 70, 229, 0.2);
 }
 
-.eyebrow {
+.h2bub{
+    display:inline-block;
     text-transform: uppercase;
     letter-spacing: 0.2em;
     font-size: 0.8rem;
     margin-bottom: 8px;
     opacity: 0.8;
 }
-
-.hero h1 {
-    margin: 0 0 10px;
-    font-size: 2rem;
-}
-
 .projects-section {
     margin-top: 28px;
 }
-
 .projects-section h2 {
     margin-bottom: 16px;
 }
-
 .project-grid {
     display: grid;
     gap: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: auto auto;
 }
-
 .project-card {
     background: white;
     border: 1px solid #e5e7eb;
@@ -107,7 +98,6 @@ header {
     padding: 18px;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
-
 .project-card summary {
     cursor: pointer;
     font-weight: 600;
@@ -116,17 +106,14 @@ header {
     align-items: center;
     justify-content: space-between;
 }
-
 .project-card summary::-webkit-details-marker {
     display: none;
 }
-
 .project-content {
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid #e5e7eb;
 }
-
 .project-link {
     display: inline-block;
     margin-top: 8px;
@@ -138,13 +125,12 @@ header {
 }
 
 .project-link:hover {
-    background: #4f46e5;
+    background: black;
 }
 
 #hello {
     margin-top: 28px;
 }
-
 .login-container {
     display:flex;
     align-items:center;
@@ -202,7 +188,6 @@ header {
     margin-top:14px;
 }
 .button-row button {
-    background:linear-gradient(90deg, #ffffff, #e8e8e8);
     width:110px;
     border-radius:50px;
     border:none;
@@ -217,10 +202,10 @@ header {
 }
 .note {
     color:white;
-    font-size:0.7em;
+    font-size:0.5em;
     text-align:center;
     margin-top:14px;
-    opacity:0.8;
+    opacity:0.65;
 }
 label {
     margin-left:10px;
@@ -242,4 +227,26 @@ button {
 }
 .fa-github {
     color:white;
+}
+.profile-picture{
+    display:block;
+    margin:10px;
+    width:400px;
+    height:400px;
+}
+#aboutdiv{
+    display:inline;
+    margin:10px;
+}
+#Abouth2{
+    text-align:center;
+}
+#aboutdiv p{
+    text-align:center;
+}
+.prodes{
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    display: grid;
+    gap: 16px;
+    grid-template-columns: auto auto;
 }
