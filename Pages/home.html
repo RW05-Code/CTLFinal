@@ -5,24 +5,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="Image.png">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="../Image.png">
 </head>
 <body>
-    <header style="background-color:black; margin:0px; padding:10px;">
-        <a href="https://github.com/RW05-Code/CTLFinal" target="_blank">
-        <i class="fa-brands fa-github-2x"></i>
+    <header>
+        <a class="github-link" href="https://github.com/RW05-Code/CTLFinal" target="_blank" aria-label="Open GitHub repository">
+            <i class="fa-brands fa-github fa-2x"></i>
         </a>
         <nav class="navbar">
-        <ul>
-            <li><a href="home.html">Home</a></li>
-            <li><a href="page2.html">Page 2</a></li>
-            <li><a href="page3.html">Page 3</a></li>
-        </ul>
-    </nav>
+            <ul>
+                <li><a class="active" href="home.html">Home</a></li>
+                <li><a href="page2.html">Projects</a></li>
+                <li><a href="page3.html">About</a></li>
+            </ul>
+        </nav>
     </header>
-    <a href="page2.html"><img src=""></a>
-    <h2 id="hello"></h2>
+
+    <main class="home-page">
+        <section class="hero">
+            <p class="eyebrow">Welcome</p>
+            <h1>Build, learn, and share creative work.</h1>
+            <p>Browse the featured projects below and open the detail pages for a closer look.</p>
+        </section>
+
+        <section class="projects-section">
+            <h2>Featured projects</h2>
+            <div class="project-grid">
+                <details class="project-card">
+                    <summary>Project One</summary>
+                    <div class="project-content">
+                        <p>A polished starter project that highlights the main ideas behind this portfolio.</p>
+                        <a class="project-link" href="page2.html">View more info</a>
+                    </div>
+                </details>
+
+                <details class="project-card">
+                    <summary>Project Two</summary>
+                    <div class="project-content">
+                        <p>An interactive experience with extra context and deeper information on the next page.</p>
+                        <a class="project-link" href="page3.html">View more info</a>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <h2 id="hello">Hello</h2>
+    </main>
+
     <script src="../index.js"></script>
 </body>
 </html>

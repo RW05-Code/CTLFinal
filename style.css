@@ -1,58 +1,245 @@
-body{
-    background-color:white;
+* {
+    box-sizing: border-box;
 }
-.navbar li{
-    float:left;
+
+body {
+    background-color: #f4f7fb;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    color: #1f2937;
+    line-height: 1.6;
 }
-.navbar ul{
-    display:flow-root;
-    list-style-type:none;
-    padding:0px;
+
+header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: linear-gradient(90deg, #111827, #1f2937);
+    padding: 14px 24px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.github-link {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.github-link:hover {
+    opacity: 0.85;
+}
+
+.navbar ul {
+    display: flex;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 999px;
+    display: inline-block;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.navbar a:hover,
+.navbar a.active {
+    background-color: rgba(255, 255, 255, 0.16);
+    transform: translateY(-1px);
+}
+
+.home-page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px 20px 48px;
+}
+
+.hero {
+    background: linear-gradient(135deg, #111827, #4f46e5);
+    color: white;
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 12px 30px rgba(79, 70, 229, 0.2);
+}
+
+.eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+    opacity: 0.8;
+}
+
+.hero h1 {
+    margin: 0 0 10px;
+    font-size: 2rem;
+}
+
+.projects-section {
+    margin-top: 28px;
+}
+
+.projects-section h2 {
+    margin-bottom: 16px;
+}
+
+.project-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.project-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.project-card summary {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.project-card summary::-webkit-details-marker {
+    display: none;
+}
+
+.project-content {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.project-link {
+    display: inline-block;
+    margin-top: 8px;
+    text-decoration: none;
+    background: #111827;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 999px;
+}
+
+.project-link:hover {
+    background: #4f46e5;
+}
+
+#hello {
+    margin-top: 28px;
+}
+
+.login-container {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:calc(100vh - 80px);
+    padding:20px;
+    box-sizing:border-box;
+}
+.login-box {
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:16px;
+    width:450px;
+    background:rgba(0, 0, 0, 0.82);
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    padding:24px;
+    margin:10px;
+    color:white;
+}
+.login-box h4 {
+    margin-top:0;
     margin-bottom:20px;
-    overflow:hidden;
-}
-.navbar a{
-    color:black;
-    text-decoration:none;
-    padding:15px 25px 15px 50px;
-    display:block;
+    font-size:1.4em;
     text-align:center;
 }
-label{
+.form-row {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin-bottom:14px;
+}
+.form-row label {
+    font-size:0.8em;
+    color:white;
+    margin-bottom:6px;
+    align-self:flex-start;
+    margin-left:25px;
+}
+.form-row input {
+    border-radius:50px;
+    height:38px;
+    width:90%;
+    max-width:400px;
+    padding:0 14px;
+    box-sizing:border-box;
+    border:1px solid #ccc;
+    outline:none;
+}
+.form-row input:focus {
+    border-color:#4da3ff;
+    box-shadow:0 0 0 2px rgba(77,163,255,0.2);
+}
+.button-row {
+    display:flex;
+    justify-content:center;
+    margin-top:14px;
+}
+.button-row button {
+    background:linear-gradient(90deg, #ffffff, #e8e8e8);
+    width:110px;
+    border-radius:50px;
+    border:none;
+    padding:8px 0;
+    margin:0;
+    cursor:pointer;
+}
+.button-row a {
+    text-decoration:none;
+    color:black;
+    font-weight:600;
+}
+.note {
+    color:white;
+    font-size:0.7em;
+    text-align:center;
+    margin-top:14px;
+    opacity:0.8;
+}
+label {
     margin-left:10px;
 }
-button{
+button {
     margin-left:10px;
     margin-right:auto;
 }
-/*
-.cards{
-    background-color:black;
-    border-radius:15px;
-    margin-left:15px;
-    margin-top:10px;
-    margin-bottom:10px;
-    padding:5px;
-    width:700px;
-    height:350px;
-    box-shadow:1px 1px 8px rgb(189, 189, 189);
-    display:flow-root;
-}
-.contain{
-    background-color:white;
-    border-radius:15px;
-    margin:25px;
-    padding:10px;
-    width:300px;
-    height:275px;
-}
-*/
-#sub button:hover{
+#sub button:hover {
     background-color:gray;
 }
-#loginb{
-    background-image:;
+#loginb {
+    background-image:url(https://static.vecteezy.com/system/resources/previews/048/675/733/non_2x/matte-white-and-grey-frosted-glass-texture-blur-effect-stained-glass-decorative-background-vector.jpg);
+    background-repeat: no-repeat;
+    background-position: top;
+    background-attachment: fixed;
+    background-size:cover;
+    min-height:100vh;
 }
-.fa-brands-fa-github-2x{
+.fa-github {
     color:white;
 }
