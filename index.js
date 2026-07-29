@@ -11,28 +11,28 @@ function updateGreeting(name) {
     }
 }
 
-function loadGreeting() {
+function saveName() {
+    const firstName = firstNameInput ? firstNameInput.value.trim() : "";
+    const lastName = lastNameInput ? lastNameInput.value.trim() : "";
+
+    if (firstName) {
+        localStorage.setItem(storageKey, firstName);
+        localStorage.setItem(lastStorageKey, lastName);
+        updateGreeting(firstName);
+    } else {
+        localStorage.removeItem(storageKey);
+        localStorage.removeItem(lastStorageKey);
+        updateGreeting("");
+    }
+}
+
+if (submitButton) {
+    submitButton.addEventListener("click", saveName);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
     const savedName = localStorage.getItem(storageKey);
     if (savedName) {
         updateGreeting(savedName);
     }
-}
-
-if (submitButton && firstNameInput) {
-    submitButton.addEventListener("click", function () {
-        const firstName = firstNameInput.value.trim();
-        const lastName = lastNameInput.value.trim();
-
-        if (firstName) {
-            localStorage.setItem(storageKey, firstName);
-            localStorage.setItem(lastStorageKey, lastName);
-            updateGreeting(firstName);
-        } else {
-            localStorage.removeItem(storageKey);
-            localStorage.removeItem(lastStorageKey);
-            updateGreeting("");
-        }
-    });
-}
-
-document.addEventListener("DOMContentLoaded", loadGreeting);
+});
