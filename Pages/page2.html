@@ -7,15 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="../Image.png">
+    <link rel="icon" href="../ImagesAndVideos/Image.png">
     <link rel="stylesheet" href="../style.css">
     <title>Projects</title>
 </head>
 <body>
     <header>
-        <a class="github-link" href="https://github.com/RW05-Code/CTLFinal" target="_blank" aria-label="Open GitHub repository">
-            <i class="fa-brands fa-github fa-2x"></i>
-        </a>
         <nav class="navbar">
             <ul>
                 <li><a href="home.html">Home</a></li>
@@ -23,37 +20,64 @@
                 <li><a href="page3.html">About</a></li>
             </ul>
         </nav>
+        <div class="header-badge">
+            <span class="header-badge__viewing">
+                <img src="../ImagesAndVideos/Image.png" alt="Profile" class="header-badge__avatar">
+                <span>Viewing</span>
+            </span>
+            <span class="header-badge__page">Projects</span>
+        </div>
     </header>
-        <main>
-            <h1>Projects</h1>
-            <p></p>
-            <div id="prodesgr">
-                <div id="pro1" class="prodes">
-                    <video src="" width="" loop></video>
-                    <h2>Animal Website</h2>
-                    <p>A website written in HTML and CSS</p>
-                    <a href="https://github.com/RW05-Code/Website">View the repository</a>
+        <main class="home-page projects-page">
+        <div class="bub">
+            <h2 class="h2bub">Projects</h2>
+            <p>Here are a few of the projects I’ve worked on, with links to the repositories and a quick summary of each one.</p>
+        </div>
+        <div class="projects-section">
+            <div class="project-grid">
+                <div id="animal-project" class="project-card">
+                    <div class="project-video-placeholder">
+                        <span><video src="../ImagesAndVideos/Animal.mp4" loop autoplay muted></video></span>
+                    </div>
+                    <h3>Animal Website</h3>
+                    <div class="project-content">
+                        <p>A website written in HTML and CSS that focuses on three different food items. It presents the basics of HTML, with headings, paragraphs, lists, images, etc.</p>
+                        <a class="project-link" href="https://github.com/RW05-Code/Website" target="_blank" rel="noopener noreferrer">View the repository</a>
+                    </div>
                 </div>
-                <div id="pro2" class="prodes">
-                    <video src="" width="" loop></video>
-                    <h2></h2>
-                    <p></p>
-                    <a href="">View the repository</a>
+                <div id="recipe-project" class="project-card">
+                    <div class="project-video-placeholder">
+                        <span><video src="../ImagesAndVideos/Recipe.mp4" loop autoplay muted></video></span>
+                    </div>
+                    <h3>Recipe Website</h3>
+                    <div class="project-content">
+                        <p>A responsive design experiment using CSS layout techniques to present recipes clearly.</p>
+                        <a class="project-link" href="https://github.com/RW05-Code/Recipe" target="_blank" rel="noopener noreferrer">View the repository</a>
+                    </div>
                 </div>
-                <div id="pro3" class="prodes">
-                    <video src="" width="" loop></video>
-                    <h2></h2>
-                    <p></p>
-                    <a href="">View the repository</a>
+                <div id="mondrian-project" class="project-card">
+                    <div class="project-video-placeholder">
+                        <span><video src="../ImagesAndVideos/Mondrian.mp4" loop autoplay muted></video></span>
+                    </div>
+                    <h3>Mondrian Painting</h3>
+                    <div class="project-content">
+                        <p>A website using css grid to make a Modrian style painting</p>
+                        <a class="project-link" href="https://github.com/RW05-Code/Mondrian" target="_blank" rel="noopener noreferrer">View the repository</a>
+                    </div>
                 </div>
-                <div id="pro4" class="prodes">
-                    <video src="" width="" loop></video>
-                    <h2></h2>
-                    <p></p>
-                    <a href="">View the repository</a>
+                <div id="rainbow-project" class="project-card">
+                    <div class="project-video-placeholder">
+                        <span><video src="../ImagesAndVideos/Rainbow.mp4" loop autoplay muted></video></span>
+                    </div>
+                    <h3>Rainbow</h3>
+                    <div class="project-content">
+                        <p>A website using with a rainbow style navbar</p>
+                        <a class="project-link" href="https://github.com/RW05-Code/Rainbow/tree/main" target="_blank" rel="noopener noreferrer">View the repository</a>
+                    </div>
                 </div>
             </div>
-        </main>
-    <script src="../index.js"></script>
+        </div>
+    </main>
+    <script src="../index.js" defer></script>
 </body>
 </html>

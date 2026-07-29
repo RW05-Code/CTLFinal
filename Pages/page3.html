@@ -8,14 +8,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About</title>
-    <link rel="icon" href="../Image.png">
+    <link rel="icon" href="../ImagesAndVideos/Image.png">
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
     <header>
-        <a class="github-link" href="https://github.com/RW05-Code/CTLFinal" target="_blank" aria-label="Open GitHub repository">
-            <i class="fa-brands fa-github fa-2x"></i>
-        </a>
         <nav class="navbar">
             <ul>
                 <li><a href="home.html">Home</a></li>
@@ -23,16 +20,25 @@
                 <li><a class="active" href="page3.html">About</a></li>
             </ul>
         </nav>
+        <div class="header-badge">
+            <span class="header-badge__viewing">
+                <img src="../ImagesAndVideos/Image.png" alt="Profile" class="header-badge__avatar">
+                <span>Viewing</span>
+            </span>
+            <span class="header-badge__page">About</span>
+        </div>
     </header>
     <main>
-        <a href="" aria-label="Profile">
-            <img src="../Image.png" alt="Profile Picture" class="profile-picture">
-        </a>
-        <div id="aboutdiv">
-        <h2 id="Abouth2">About Me</h2>
-        <p id="About">I'm a human who uses Youtube to learn about coding.</p>
+        <div class="about-layout">
+            <a href="" aria-label="Profile">
+                <img src="../ImagesAndVideos/Image.png" alt="Profile Picture" class="profile-picture">
+            </a>
+            <div id="aboutdiv">
+                <h2 id="Abouth2">About Me</h2>
+                <p id="About">I'm a human who uses Youtube to learn about coding.</p>
+            </div>
         </div>
     </main>
-    <script src="../index.js"></script>
+    <script src="../index.js" defer></script>
 </body>
 </html>

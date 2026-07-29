@@ -11,6 +11,31 @@ function updateGreeting(name) {
     }
 }
 
+function saveName() {
+    const firstName = firstNameInput ? firstNameInput.value.trim() : "";
+    const lastName = lastNameInput ? lastNameInput.value.trim() : "";
+
+    if (firstName) {
+        localStorage.setItem(storageKey, firstName);
+        localStorage.setItem(lastStorageKey, lastName);
+        updateGreeting(firstName);
+    } else {
+        localStorage.removeItem(storageKey);
+        localStorage.removeItem(lastStorageKey);
+        updateGreeting("");
+    }
+}
+
+if (submitButton) {
+    submitButton.addEventListener("click", saveName);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const savedName = localStorage.getItem(storageKey);
+    if (savedName) {
+        updateGreeting(savedName);
+    }
+});
 function loadGreeting() {
     const savedName = localStorage.getItem(storageKey);
     if (savedName) {

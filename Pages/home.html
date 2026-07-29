@@ -9,13 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <link rel="stylesheet" href="../style.css">
-    <link rel="icon" href="../Image.png">
+    <link rel="icon" href="../ImagesAndVideos/Image.png">
 </head>
 <body>
     <header>
-        <a class="github-link" href="https://github.com/RW05-Code/CTLFinal" target="_blank" aria-label="Open GitHub repository">
-            <i class="fa-brands fa-github fa-2x"></i>
-        </a>
         <nav class="navbar">
             <ul>
                 <li><a class="active" href="home.html">Home</a></li>
@@ -23,50 +20,61 @@
                 <li><a href="page3.html">About</a></li>
             </ul>
         </nav>
+        <div class="header-badge">
+            <span class="header-badge__viewing">
+                <img src="../ImagesAndVideos/Image.png" alt="Profile" class="header-badge__avatar">
+                <span>Viewing</span>
+            </span>
+            <span class="header-badge__page">Home</span>
+        </div>
     </header>
     <main class="home-page">
-        <section class="bub">
+        <div class="bub">
             <img src="" style="display:block; margin:5px;">
             <h2 class="h2bub" id="hello">Welcome</h2>
-        </section>
-        <section class="projects-section">
-            <h2>Featured projects</h2>
+        </div>
+        <div class="projects-section">
+            <h2>HTML CSS Projects</h2>
             <div class="project-grid">
-                <details class="project-card">
-                    <summary>Animal (Food) Website</summary>
+                <div class="project-card">
+                    <img class="project-image" src="../ImagesAndVideos/Image.png" alt="Placeholder project preview">
+                    <h3>Animal (Food) Website</h3>
                     <div class="project-content">
                         <p>A website describing food, how to make them, etc (even though the main project was for animals)</p>
-                        <a class="project-link" href="page2.html">View more info</a>
-                        <a class="project-link" href="https://github.com/RW05-Code/Website">View the repository</a>
+                        <a class="project-link" href="page2.html#animal-project">View more info</a>
+                        <a class="project-link" href="https://github.com/RW05-Code/Website" target="_blank" rel="noopener noreferrer">View the repository</a>
                     </div>
-                </details>
-                <details class="project-card">
-                    <summary>Recipe Website</summary>
+                </div>
+                <div class="project-card">
+                    <img class="project-image" src="../ImagesAndVideos/Image.png" alt="Placeholder project preview">
+                    <h3>Recipe Website</h3>
                     <div class="project-content">
                         <p>A website using css grid to display instructions for recipe</p>
-                        <a class="project-link" href="page2.html">View more info</a>
-                        <a class="project-link" href="">View the repository</a>
+                        <a class="project-link" href="page2.html#recipe-project">View more info</a>
+                        <a class="project-link" href="https://github.com/RW05-Code/Recipe" target="_blank" rel="noopener noreferrer">View the repository</a>
                     </div>
-                </details>
-                <details class="project-card">
-                    <summary></summary>
+                </div>
+                <div class="project-card">
+                    <img class="project-image" src="../ImagesAndVideos/Image.png" alt="Placeholder project preview">
+                    <h3>Mondrian Painting</h3>
                     <div class="project-content">
-                        <p>An interactive experience with extra context and deeper information on the next page.</p>
-                        <a class="project-link" href="page2.html">View more info</a>
-                        <a class="project-link" href="">View the repository</a>
+                        <p>A website using css grid to make a Modrian style painting</p>
+                        <a class="project-link" href="page2.html#mondrian-project">View more info</a>
+                        <a class="project-link" href="https://github.com/RW05-Code/Mondrian" target="_blank" rel="noopener noreferrer">View the repository</a>
                     </div>
-                </details>
-                <details class="project-card">
-                    <summary>Project Four</summary>
+                </div>
+                <div class="project-card">
+                    <img class="project-image" src="../ImagesAndVideos/Image.png" alt="Placeholder project preview">
+                    <h3>Rainbow</h3>
                     <div class="project-content">
-                        <p>An interactive experience with extra context and deeper information on the next page.</p>
-                        <a class="project-link" href="page2.html">View more info</a>
-                        <a class="project-link" href="">View the repository</a>
+                        <p>A website using a rainbow style navbar</p>
+                        <a class="project-link" href="page2.html#rainbow-project">View more info</a>
+                        <a class="project-link" href="https://github.com/RW05-Code/Rainbow/tree/main" target="_blank" rel="noopener noreferrer">View the repository</a>
                     </div>
-                </details>
+                </div>
             </div>
-        </section>
+        </div>
     </main>
-    <script src="../index.js"></script>
+    <script src="../index.js" defer></script>
 </body>
 </html>

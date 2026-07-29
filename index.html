@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="icon" href="Image.png">
+    <link rel="icon" href="ImagesAndVideos/Image.png">
     <link rel="stylesheet" href="style.css">
     <title>Login</title>
 </head>
@@ -16,20 +16,27 @@
         <a href="https://github.com/RW05-Code/CTLFinal" target="_blank" aria-label="View project repo">
             <i class="fa-brands fa-github fa-2x"></i>
         </a>
+        <div class="header-badge">
+            <span class="header-badge__viewing">
+                <img src="ImagesAndVideos/Image.png" alt="Profile" class="header-badge__avatar">
+                <span>Viewing</span>
+            </span>
+            <span class="header-badge__page">Login</span>
+        </div>
     </header>
     <div class="login-container">
         <div class="login-box">
-            <h4 style="text-align:center; color:white;">Sign In</h4>
+            <h4 class="login-title">Sign In</h4>
             <div class="form-row">
                 <label for="first">First Name:</label>
-                <input id="first" type="text" placeholder="John">
+                <input id="first" type="text" placeholder="John" required>
             </div>
             <div class="form-row">
                 <label for="last">Last Name:</label>
-                <input id="last" type="text" placeholder="Doe">
+                <input id="last" type="text" placeholder="Doe" required>
             </div>
             <div class="button-row">
-                <button id="sub"><a href="Pages/home.html">SUBMIT</a></button>
+                <a id="sub" class="submit-link" href="Pages/home.html">SUBMIT</a>
             </div>
             <p class="note">* There is no PHP involved</p>
         </div>
