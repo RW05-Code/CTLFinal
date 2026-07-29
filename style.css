@@ -213,7 +213,7 @@ header {
     display: inline-block;
     margin-top: 0;
     text-decoration: none;
-    background: #111827;
+    background: black;
     color: white;
     padding: 8px 14px;
     border-radius: 999px;
@@ -222,8 +222,8 @@ header {
 }
 
 .project-link:hover {
-    background: black;
-    color: #f9fafb;
+    background: rgb(77, 77, 77);
+    color: white;
 }
 
 #hello {
@@ -241,17 +241,23 @@ header {
     border:1px solid rgba(255,255,255,0.2);
     border-radius:16px;
     width:450px;
-    background:rgba(0, 0, 0, 0.82);
+    background:white;
     box-shadow:0 10px 30px rgba(0,0,0,0.3);
     padding:24px;
     margin:10px;
-    color:white;
+    color:black;
 }
 .login-title {
     margin:0 0 20px;
-    font-size:1.4em;
+    font-size:1.1em;
     text-align:center;
-    color:white;
+    color:black;
+}
+#first{
+    box-shadow: 0px 3px 20px rgba(15, 23, 42, 0.06)
+}
+#last{
+    box-shadow: 0px 3px 20px rgba(15, 23, 42, 0.06)
 }
 .form-row {
     display:flex;
@@ -286,19 +292,21 @@ header {
     margin-top:14px;
 }
 .submit-link {
+    border: 1px solid rgba(17, 23, 37, 0.274);
     display:inline-block;
     width:110px;
     border-radius:50px;
     padding:8px 0;
     background:white;
     color:black;
-    font-weight:600;
+    font-weight:100;
     text-align:center;
     text-decoration:none;
+    font-size:0.8em;
 }
 .note {
-    color:white;
-    font-size:0.5em;
+    color:black;
+    font-size:0.45em;
     text-align:center;
     margin-top:14px;
     opacity:0.65;
@@ -314,7 +322,7 @@ button {
     background-color:gray;
 }
 #loginb {
-    background-image:url(https://static.vecteezy.com/system/resources/previews/048/675/733/non_2x/matte-white-and-grey-frosted-glass-texture-blur-effect-stained-glass-decorative-background-vector.jpg);
+    background:white;
     background-repeat: no-repeat;
     background-position: top;
     background-attachment: fixed;
@@ -357,4 +365,61 @@ button {
     display: grid;
     gap: 16px;
     grid-template-columns: auto auto;
+}
+.selection-box {
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    background-color:white;
+    border-radius:50px;
+    width:500px;
+    display:grid;
+    grid-template-columns:auto auto;
+    grid-template-rows:auto auto;
+    justify-content:center;
+    height:auto;
+    padding:20px;
+    margin:20px;
+    box-sizing:border-box;
+}
+.selection-content {
+    border-top: 1px solid #e5e7eb;
+    display:grid;
+    align-items: center;
+    justify-content: center;
+    padding:10px;
+}
+#prehome-h3{
+    font-weight:200;
+    text-align:center;
+    grid-column-start:1;
+    grid-column-end:2;
+}
+.portselection{
+    display:inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 999px;
+    padding: 6px 10px 6px 6px;
+    background: rgba(255,255,255,0.08);
+}
+.port-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: black;
+    color: white;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.port-badgeimg{
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    background:white;
+    border: 1px solid rgba(0, 0, 0, 0.12);
 }
