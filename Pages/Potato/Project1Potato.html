@@ -1,0 +1,1130 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spud & Peel - A Cozy Peeling Game</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for cozy icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tone.js for sound effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Sniglet:wght@400;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wood: {
+                            light: '#e2d4be',
+                            DEFAULT: '#c4a482',
+                            dark: '#8b5a2b',
+                            darker: '#5c3a17'
+                        },
+                        spud: {
+                            light: '#f5e5c9',
+                            DEFAULT: '#dcb172',
+                            skin: '#a6723e',
+                            dark: '#784d20'
+                        },
+                        cozy: {
+                            cream: '#fdfbf7',
+                            sage: '#8a9a86',
+                            rose: '#d9a099',
+                            warm: '#f7eedd',
+                            accent: '#e07a5f'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Fredoka', 'sans-serif'],
+                        sniglet: ['Sniglet', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f7eedd;
+            background-image: radial-gradient(#e5d5be 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .peel-particle {
+            pointer-events: none;
+            position: absolute;
+            animation: floatAndFade 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes floatAndFade {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) rotate(0deg) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) scale(0.6);
+            }
+        }
+
+        .float-text {
+            pointer-events: none;
+            position: absolute;
+            font-weight: 700;
+            animation: floatUp 1s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            50% { opacity: 0.9; transform: translateY(-25px) scale(1.1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(0.9); }
+        }
+
+        /* Tree Node Canvas lines container */
+        .tree-line-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1e4d1;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c4a482;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #8b5a2b;
+        }
+
+        .btn-bounce:active {
+            transform: scale(0.95);
+        }
+
+        .glow-gold {
+            box-shadow: 0 0 15px rgba(224, 122, 95, 0.4);
+        }
+    </style>
+</head>
+<body class="font-sans text-wood-darker min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- Top Bar -->
+    <header class="bg-wood-light/90 backdrop-blur border-b-4 border-wood-dark px-4 py-3 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-spud-DEFAULT border-2 border-wood-dark flex items-center justify-center text-xl shadow-inner">
+                    🥔
+                </div>
+                <div>
+                    <h1 class="font-sniglet text-xl sm:text-2xl font-bold text-wood-darker leading-none">Spud & Peel</h1>
+                    <p class="text-xs text-wood-dark font-medium">A Quaint & Cozy Peeling Tale</p>
+                </div>
+            </div>
+
+            <!-- Currency Indicators -->
+            <div class="flex items-center gap-2 sm:gap-6 bg-cozy-cream px-4 py-2 rounded-2xl border-2 border-wood/40 shadow-inner">
+                <!-- Coins -->
+                <div class="flex items-center gap-2" title="Potato Coins - Used for Kitchen Upgrades">
+                    <div class="w-8 h-8 rounded-full bg-amber-400 border border-amber-600 flex items-center justify-center text-amber-900 font-bold text-sm shadow">
+                        🪙
+                    </div>
+                    <div>
+                        <div class="text-xs text-stone-500 font-semibold leading-tight">Coins</div>
+                        <div id="stat-coins" class="text-base sm:text-lg font-bold text-amber-800 leading-none">0</div>
+                    </div>
+                </div>
+
+                <div class="h-8 w-0.5 bg-wood/30"></div>
+
+                <!-- Potatoes Peeled -->
+                <div class="flex items-center gap-2" title="Peeled Potatoes - Used for Skill Tree Upgrades">
+                    <div class="w-8 h-8 rounded-full bg-spud-skin border border-spud-dark flex items-center justify-center text-white font-bold text-sm shadow">
+                        🥔
+                    </div>
+                    <div>
+                        <div class="text-xs text-stone-500 font-semibold leading-tight">Spud Points</div>
+                        <div id="stat-spuds" class="text-base sm:text-lg font-bold text-spud-dark leading-none">0</div>
+                    </div>
+                </div>
+
+                <div class="h-8 w-0.5 bg-wood/30"></div>
+
+                <!-- Per Second -->
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-cozy-sage/30 border border-cozy-sage flex items-center justify-center text-emerald-800 font-bold text-xs shadow">
+                        ⚡
+                    </div>
+                    <div>
+                        <div class="text-xs text-stone-500 font-semibold leading-tight">Peels/sec</div>
+                        <div id="stat-pps" class="text-base sm:text-lg font-bold text-emerald-700 leading-none">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="flex items-center gap-2">
+                <button id="btn-sound" onclick="toggleSound()" class="p-2.5 rounded-xl bg-cozy-cream border-2 border-wood/40 hover:bg-wood-light text-wood-dark font-bold text-sm transition btn-bounce" title="Toggle Sound">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+                <button onclick="saveGame(true)" class="p-2.5 rounded-xl bg-cozy-cream border-2 border-wood/40 hover:bg-wood-light text-wood-dark font-bold text-sm transition btn-bounce" title="Save Game">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                </button>
+                <button onclick="confirmReset()" class="p-2.5 rounded-xl bg-cozy-cream border-2 border-wood/40 hover:bg-rose-100 text-rose-700 font-bold text-sm transition btn-bounce" title="Reset Progress">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto w-full p-3 sm:p-6 flex-grow flex flex-col">
+        <!-- Navigation Tabs -->
+        <nav class="flex border-b-2 border-wood/30 mb-6 gap-2 sm:gap-4 overflow-x-auto pb-1">
+            <button onclick="switchTab('peel')" id="tab-btn-peel" class="tab-btn active px-4 py-2.5 rounded-t-2xl font-bold text-sm sm:text-base transition-all flex items-center gap-2 bg-wood-dark text-white shadow-md">
+                <i class="fa-solid fa-kitchen-set"></i> Peeling Station
+            </button>
+            <button onclick="switchTab('shop')" id="tab-btn-shop" class="tab-btn px-4 py-2.5 rounded-t-2xl font-bold text-sm sm:text-base transition-all flex items-center gap-2 bg-cozy-cream/70 text-wood-dark hover:bg-cozy-cream">
+                <i class="fa-solid fa-store"></i> Kitchen Shop (Coins)
+            </button>
+            <button onclick="switchTab('tree')" id="tab-btn-tree" class="tab-btn px-4 py-2.5 rounded-t-2xl font-bold text-sm sm:text-base transition-all flex items-center gap-2 bg-cozy-cream/70 text-wood-dark hover:bg-cozy-cream">
+                <i class="fa-solid fa-seedling"></i> Heritage Tree (Spud Points)
+            </button>
+            <button onclick="switchTab('recipes')" id="tab-btn-recipes" class="tab-btn px-4 py-2.5 rounded-t-2xl font-bold text-sm sm:text-base transition-all flex items-center gap-2 bg-cozy-cream/70 text-wood-dark hover:bg-cozy-cream">
+                <i class="fa-solid fa-utensils"></i> Recipes & Stats
+            </button>
+        </nav>
+
+        <!-- TAB 1: PEELING STATION -->
+        <section id="tab-peel" class="tab-content flex-grow flex flex-col lg:flex-row gap-6 items-center lg:items-stretch">
+            <!-- Left Side: Interactive Potato Workspace -->
+            <div class="flex-1 w-full bg-cozy-cream/90 border-4 border-wood rounded-3xl p-6 shadow-lg flex flex-col items-center justify-between relative overflow-hidden min-h-[420px]">
+                
+                <!-- Cozy Kitchen Background Decor -->
+                <div class="absolute top-4 left-4 flex items-center gap-2 text-xs font-semibold bg-wood-light/60 px-3 py-1.5 rounded-xl text-wood-darker">
+                    <i class="fa-solid fa-mug-hot text-amber-700"></i> Warm Tea Time
+                </div>
+                <div id="potato-type-badge" class="absolute top-4 right-4 text-xs font-bold bg-amber-200/80 text-amber-900 border border-amber-400 px-3 py-1.5 rounded-xl">
+                    Russet Potato
+                </div>
+
+                <!-- Guidance Info -->
+                <div class="text-center mt-6">
+                    <h2 class="text-xl font-bold text-wood-darker">Click or Swipe to Peel!</h2>
+                    <p class="text-xs text-stone-500">Each peel grants Spud Points & Potato Coins</p>
+                </div>
+
+                <!-- Potato Click Container -->
+                <div id="potato-container" class="relative my-auto cursor-pointer touch-none flex items-center justify-center p-8 transition-transform duration-100">
+                    <!-- Potato Visual -->
+                    <div id="potato-element" class="relative w-56 h-40 sm:w-72 sm:h-48 rounded-[50%_50%_45%_45%/60%_60%_40%_40%] bg-gradient-to-br from-spud-skin via-spud-DEFAULT to-spud-dark shadow-2xl border-4 border-spud-dark flex items-center justify-center transition-all duration-150 hover:scale-105 active:scale-95">
+                        
+                        <!-- Skin Textures / Spots -->
+                        <div class="absolute w-4 h-2 bg-spud-dark/40 rounded-full top-8 left-12 transform -rotate-12"></div>
+                        <div class="absolute w-3 h-3 bg-spud-dark/30 rounded-full bottom-10 right-16"></div>
+                        <div class="absolute w-5 h-2 bg-spud-dark/35 rounded-full top-14 right-10 transform rotate-45"></div>
+                        <div class="absolute w-2 h-2 bg-spud-dark/40 rounded-full bottom-8 left-16"></div>
+
+                        <!-- Peeled Flesh Window -->
+                        <div id="peel-progress-window" class="w-2/3 h-2/3 bg-spud-light rounded-full border-2 border-amber-300/60 shadow-inner flex flex-col items-center justify-center opacity-90 transition-all duration-200">
+                            <span class="text-xs font-extrabold text-amber-800/70 tracking-wider uppercase">Peeled!</span>
+                            <span id="peel-percent" class="text-lg font-black text-amber-900">0%</span>
+                        </div>
+
+                        <!-- Cute Eyes / Smile for Cozy Vibe -->
+                        <div class="absolute -top-3 flex gap-6">
+                            <div class="w-3 h-3 bg-wood-darker rounded-full flex items-center justify-center">
+                                <div class="w-1 h-1 bg-white rounded-full translate-x-0.5 -translate-y-0.5"></div>
+                            </div>
+                            <div class="w-3 h-3 bg-wood-darker rounded-full flex items-center justify-center">
+                                <div class="w-1 h-1 bg-white rounded-full translate-x-0.5 -translate-y-0.5"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floating Effects Layer -->
+                <div id="floating-layer" class="absolute inset-0 pointer-events-none"></div>
+
+                <!-- Peeler Tool Tracker -->
+                <div class="w-full bg-wood-light/40 border border-wood/30 rounded-2xl p-3 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-wood-light flex items-center justify-center text-wood-dark text-lg font-bold border border-wood">
+                            <i id="equipped-tool-icon" class="fa-solid fa-utensils"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-stone-500 font-medium">Equipped Tool</div>
+                            <div id="equipped-tool-name" class="text-sm font-bold text-wood-darker">Rustic Butter Knife</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-stone-500 font-medium">Peel Power</div>
+                        <div id="stat-peel-power" class="text-sm font-bold text-amber-800">+1 per peel</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Quick Upgrade Bar / Cozy Companion Chatter -->
+            <div class="w-full lg:w-80 flex flex-col gap-4">
+                <!-- Companion Card -->
+                <div class="bg-cozy-cream border-4 border-wood rounded-3xl p-5 shadow-sm flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-cozy-rose/30 border-2 border-cozy-rose flex items-center justify-center text-2xl shrink-0">
+                        🐱
+                    </div>
+                    <div>
+                        <h3 id="companion-title" class="font-bold text-wood-darker text-sm">Barnaby the Kitchen Cat</h3>
+                        <p id="companion-quote" class="text-xs text-stone-600 italic mt-0.5">"Purr... that peel strip came off in one smooth spiral!"</p>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Summary -->
+                <div class="bg-wood-light/40 border-2 border-wood/30 rounded-3xl p-5 flex flex-col gap-3">
+                    <h4 class="font-bold text-wood-dark text-sm border-b border-wood/20 pb-2">
+                        <i class="fa-solid fa-chart-line mr-1"></i> Quick Efficiency
+                    </h4>
+                    
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-stone-600">Base Coin Yield:</span>
+                        <span id="stat-coin-yield" class="font-bold text-amber-800">1.0 x</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-stone-600">Helper Click Speed:</span>
+                        <span id="stat-helper-speed" class="font-bold text-emerald-800">1.0x</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-stone-600">Golden Spud Chance:</span>
+                        <span id="stat-golden-chance" class="font-bold text-amber-700">1%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-stone-600">Total Lifetime Peels:</span>
+                        <span id="stat-total-peels" class="font-bold text-spud-dark">0</span>
+                    </div>
+                </div>
+
+                <!-- Mini Log / Activity Feed -->
+                <div class="bg-cozy-cream border-2 border-wood/30 rounded-3xl p-4 flex-grow flex flex-col h-48">
+                    <h4 class="font-bold text-wood-dark text-xs uppercase tracking-wider mb-2">Kitchen Log</h4>
+                    <div id="kitchen-log" class="text-xs text-stone-600 flex flex-col gap-1.5 overflow-y-auto custom-scrollbar flex-grow pr-1">
+                        <div class="text-stone-400 italic">Started peeling potatoes on the cozy farm...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: KITCHEN SHOP (COIN UPGRADES) -->
+        <section id="tab-shop" class="tab-content hidden flex-grow">
+            <div class="bg-cozy-cream border-4 border-wood rounded-3xl p-6 shadow-lg">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-wood/20 pb-4 mb-6 gap-2">
+                    <div>
+                        <h2 class="text-2xl font-bold text-wood-darker">Kitchen Tools & Helpers</h2>
+                        <p class="text-xs text-stone-500">Spend Potato Coins 🪙 to boost peel power and automate peeling.</p>
+                    </div>
+                    <div class="bg-amber-100 border border-amber-300 px-4 py-2 rounded-2xl text-amber-900 font-bold text-sm">
+                        Balance: <span id="shop-coin-balance">0</span> 🪙
+                    </div>
+                </div>
+
+                <!-- Shop Categories Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Peeler Upgrades -->
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-wood-dark text-lg flex items-center gap-2 border-b border-wood/20 pb-1">
+                            <i class="fa-solid fa-wrench text-amber-700"></i> Peeler Tools (Click Power)
+                        </h3>
+                        <div id="tool-upgrades-list" class="space-y-3">
+                            <!-- JS dynamic injection -->
+                        </div>
+                    </div>
+
+                    <!-- Kitchen Helper Upgrades -->
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-wood-dark text-lg flex items-center gap-2 border-b border-wood/20 pb-1">
+                            <i class="fa-solid fa-users text-emerald-700"></i> Kitchen Helpers (Auto-Peel)
+                        </h3>
+                        <div id="helper-upgrades-list" class="space-y-3">
+                            <!-- JS dynamic injection -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: HERITAGE TREE (SPUD POINTS UPGRADES) -->
+        <section id="tab-tree" class="tab-content hidden flex-grow flex flex-col">
+            <div class="bg-cozy-cream border-4 border-wood rounded-3xl p-6 shadow-lg flex-grow flex flex-col relative overflow-hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-wood/20 pb-4 mb-4 gap-2 z-10">
+                    <div>
+                        <h2 class="text-2xl font-bold text-wood-darker">Spud Heritage Skill Tree</h2>
+                        <p class="text-xs text-stone-500">Spend lifetime Peeled Potatoes (Spud Points 🥔) to unlock permanent masteries.</p>
+                    </div>
+                    <div class="bg-spud-light border border-spud-dark/30 px-4 py-2 rounded-2xl text-spud-dark font-bold text-sm">
+                        Available Points: <span id="tree-spud-balance">0</span> 🥔
+                    </div>
+                </div>
+
+                <!-- Skill Tree Interactive Container -->
+                <div id="tree-container" class="relative w-full flex-grow min-h-[500px] bg-wood-light/20 rounded-2xl border-2 border-wood/30 p-6 overflow-auto custom-scrollbar flex items-center justify-center">
+                    <svg id="tree-svg-lines" class="tree-line-svg"></svg>
+                    
+                    <!-- Node Grid Container -->
+                    <div id="tree-nodes-wrapper" class="relative w-[800px] h-[550px]">
+                        <!-- Dynamic Tree Nodes will be positioned here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: RECIPES & STATS -->
+        <section id="tab-recipes" class="tab-content hidden flex-grow">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Cookbook -->
+                <div class="lg:col-span-2 bg-cozy-cream border-4 border-wood rounded-3xl p-6 shadow-lg space-y-4">
+                    <div class="border-b-2 border-wood/20 pb-3">
+                        <h2 class="text-2xl font-bold text-wood-darker">Grandma's Potato Cookbook</h2>
+                        <p class="text-xs text-stone-500">Reach total peel milestones to discover delicious spud dishes!</p>
+                    </div>
+
+                    <div id="recipe-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Dynamic Recipes -->
+                    </div>
+                </div>
+
+                <!-- Detailed Stats Panel -->
+                <div class="bg-cozy-cream border-4 border-wood rounded-3xl p-6 shadow-lg flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-wood-darker border-b-2 border-wood/20 pb-3 mb-4">
+                            <i class="fa-solid fa-clipboard-list mr-2"></i> Peeling Records
+                        </h3>
+
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between border-b border-wood/10 pb-1.5">
+                                <span class="text-stone-600">Total Clicks:</span>
+                                <span id="stat-rec-clicks" class="font-bold text-wood-darker">0</span>
+                            </div>
+                            <div class="flex justify-between border-b border-wood/10 pb-1.5">
+                                <span class="text-stone-600">Lifetime Spud Points:</span>
+                                <span id="stat-rec-spuds" class="font-bold text-spud-dark">0</span>
+                            </div>
+                            <div class="flex justify-between border-b border-wood/10 pb-1.5">
+                                <span class="text-stone-600">Lifetime Coins Earned:</span>
+                                <span id="stat-rec-coins" class="font-bold text-amber-800">0</span>
+                            </div>
+                            <div class="flex justify-between border-b border-wood/10 pb-1.5">
+                                <span class="text-stone-600">Skills Unlocked:</span>
+                                <span id="stat-rec-skills" class="font-bold text-emerald-800">0 / 12</span>
+                            </div>
+                            <div class="flex justify-between border-b border-wood/10 pb-1.5">
+                                <span class="text-stone-600">Dishes Mastered:</span>
+                                <span id="stat-rec-dishes" class="font-bold text-cozy-accent">0 / 6</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-stone-600">Time Peeling:</span>
+                                <span id="stat-rec-time" class="font-bold text-stone-700">0s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cozy Quote -->
+                    <div class="mt-6 p-4 rounded-2xl bg-wood-light/40 border border-wood/30 text-center">
+                        <p class="text-xs italic text-wood-darker font-medium">
+                            "A potato peeled with love tastes twice as nice."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 text-xs text-wood-dark/70 font-semibold border-t border-wood/20 bg-wood-light/30">
+        Spud & Peel &bull; Cozy Potato Peeler Clicker &bull; Crafted with Care 🥔
+    </footer>
+
+    <!-- Modal / Toast Alert Container -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-wood-dark text-white px-5 py-3 rounded-2xl shadow-xl transition-all transform translate-y-20 opacity-0 pointer-events-none z-50 flex items-center gap-3 border-2 border-wood-light">
+        <span id="toast-icon" class="text-amber-300 text-lg">✨</span>
+        <span id="toast-message" class="text-sm font-bold">Game Saved!</span>
+    </div>
+
+    <script>
+        /* State Variables & Configuration */
+        let state = {
+            coins: 0,
+            spuds: 0,
+            lifetimeSpuds: 0,
+            lifetimeCoins: 0,
+            totalClicks: 0,
+            playTimeSeconds: 0,
+            potatoProgress: 0, // 0 to 100% current potato
+            soundEnabled: true,
+            
+            // Purchased Tool Levels
+            tools: {
+                knife: 1,      // Base tool
+                y_peeler: 0,
+                ergo_peeler: 0,
+                titanium: 0,
+                magic_blade: 0
+            },
+
+            // Purchased Helper Levels
+            helpers: {
+                barnaby: 0,    // Kitchen Cat
+                grandma: 0,    // Grandma
+                bob: 0,        // Neighbor Bob
+                robot: 0,      // Potato Bot
+                brigade: 0     // Peeling Squad
+            },
+
+            // Skill Tree Unlocks
+            skills: {},
+
+            // Unlocked Recipes
+            recipes: {}
+        };
+
+        // Coin Shop Tools Definitions
+        const TOOL_DATA = [
+            { id: 'knife', name: 'Rustic Butter Knife', baseCost: 0, power: 1, icon: 'fa-utensils', desc: 'Simple & humble. Starts every cozy journey.' },
+            { id: 'y_peeler', name: 'Classic Y-Peeler', baseCost: 25, power: 3, icon: 'fa-grip-lines', desc: 'Smooth double-sided stainless steel blade.' },
+            { id: 'ergo_peeler', name: 'Ergonomic Soft Grip', baseCost: 150, power: 12, icon: 'fa-hand', desc: 'Comfortable rubber handle. Peels with zero effort.' },
+            { id: 'titanium', name: 'Titanium Razor Peeler', baseCost: 1000, power: 50, icon: 'fa-bolt', desc: 'Ultra-sharp precision. Glides through skin.' },
+            { id: 'magic_blade', name: 'Enchanted Silver Peeler', baseCost: 7500, power: 250, icon: 'fa-wand-magic-sparkles', desc: 'Whimsical magic peels spuds automatically on touch!' }
+        ];
+
+        // Coin Shop Helpers Definitions
+        const HELPER_DATA = [
+            { id: 'barnaby', name: 'Barnaby the Cat', baseCost: 15, pps: 0.5, icon: 'fa-cat', desc: 'Swats playfully at loose potato peels.' },
+            { id: 'grandma', name: 'Grandma Spud', baseCost: 100, pps: 4, icon: 'fa-user-nurse', desc: 'Peels with decades of cozy kitchen practice.' },
+            { id: 'bob', name: 'Neighbor Bob', baseCost: 600, pps: 20, icon: 'fa-user-gear', desc: 'Loves potato salad and peels at lightning speed.' },
+            { id: 'robot', name: 'Spud-O-Matic Bot', baseCost: 4000, pps: 100, icon: 'fa-robot', desc: 'Solar-powered cozy peeling helper.' },
+            { id: 'brigade', name: 'Peeling Brigade', baseCost: 25000, pps: 500, icon: 'fa-people-group', desc: 'An entire team of enthusiastic village peelers.' }
+        ];
+
+        // Heritage Skill Tree Nodes Definitions
+        const SKILL_TREE_NODES = [
+            // Row 0: Root Node
+            { id: 'root', name: 'Cozy Awakening', cost: 10, x: 400, y: 50, icon: '🌱', desc: '+10% bonus coins from all peels.', category: 'craft', requires: [] },
+            
+            // Row 1: Craftsmanship vs Automation
+            { id: 'sharp_mind', name: 'Sharp Blade Mastery', cost: 50, x: 250, y: 160, icon: '🔪', desc: 'Click peels grant +25% extra Spud Points.', category: 'craft', requires: ['root'] },
+            { id: 'cozy_rhythm', name: 'Cozy Kitchen Vibe', cost: 50, x: 550, y: 160, icon: '☕', desc: 'Helpers peel +20% faster.', category: 'auto', requires: ['root'] },
+
+            // Row 2: Deep Craftsmanship
+            { id: 'golden_russet', name: 'Golden Spud Luck', cost: 200, x: 150, y: 280, icon: '✨', desc: '10% chance for peels to yield double coins.', category: 'craft', requires: ['sharp_mind'] },
+            { id: 'smooth_slice', name: 'Smooth Spiral Slice', cost: 350, x: 300, y: 280, icon: '🌀', desc: '+50% Click Peel Power.', category: 'craft', requires: ['sharp_mind'] },
+
+            // Row 2: Deep Automation
+            { id: 'tea_break', name: 'Tea Time Efficiency', cost: 200, x: 500, y: 280, icon: '🫖', desc: 'Helper speed increased by +30%.', category: 'auto', requires: ['cozy_rhythm'] },
+            { id: 'spud_synergy', name: 'Spud Alchemy', cost: 350, x: 650, y: 280, icon: '🧪', desc: 'Gain +1 coin per helper peel.', category: 'auto', requires: ['cozy_rhythm'] },
+
+            // Row 3: Advanced
+            { id: 'butter_glaze', name: 'Garlic Butter Glaze', cost: 1000, x: 225, y: 400, icon: '🧄', desc: '+100% total Coin multiplier.', category: 'alchemy', requires: ['golden_russet', 'smooth_slice'] },
+            { id: 'grandma_love', name: 'Grandma\'s Recipe Secret', cost: 1000, x: 575, y: 400, icon: '🥧', desc: 'All helper output multiplied by 2x.', category: 'alchemy', requires: ['tea_break', 'spud_synergy'] },
+
+            // Row 4: Ultimate Pinnacle
+            { id: 'spud_pinnacle', name: 'The Golden Spud Crown', cost: 5000, x: 400, y: 500, icon: '👑', desc: 'Triples ALL Spud Points and Coin gains forever!', category: 'pinnacle', requires: ['butter_glaze', 'grandma_love'] }
+        ];
+
+        // Dish Cookbook Database
+        const RECIPES_DATA = [
+            { id: 'mashed', name: 'Cozy Mashed Potatoes', milestone: 25, icon: '🥣', desc: 'Creamy, buttery spuds topped with fresh herbs.', reward: '+5% Coin value' },
+            { id: 'fries', name: 'Golden Country Fries', milestone: 100, icon: '🍟', desc: 'Crisp on the outside, fluffy on the inside.', reward: '+10% Peel Power' },
+            { id: 'baked', name: 'Loaded Baked Spud', milestone: 500, icon: '🥔', desc: 'Stuffed with chives, sour cream, and crispy skin.', reward: '+15% Helper speed' },
+            { id: 'gnocchi', name: 'Handmade Potato Gnocchi', milestone: 2500, icon: '🍝', desc: 'Light fluffy pillows tossed in sage butter.', reward: '+20% Spud Points' },
+            { id: 'hashbrowns', name: 'Crispy Morning Hashbrowns', milestone: 10000, icon: '🍳', desc: 'Sizzling golden shred potatoes for breakfast.', reward: '+25% Coin value' },
+            { id: 'soup', name: 'Hearty Potato Leek Soup', milestone: 50000, icon: '🍲', desc: 'Warming soup served in a rustic wooden bowl.', reward: '2x ALL production' }
+        ];
+
+        let synth, chimeSynth;
+        let audioInitialized = false;
+
+        function initAudio() {
+            if (audioInitialized) return;
+            try {
+                // Soft woodblock / crunch synth for peel clicks
+                synth = new Tone.Membranophone({
+                    pitchDecay: 0.03,
+                    octaves: 2,
+                    oscillator: { type: "sine" },
+                    envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 }
+                }).toDestination();
+                synth.volume.value = -12;
+
+                // Gentle chime for upgrades
+                chimeSynth = new Tone.PolySynth(Tone.Synth, {
+                    oscillator: { type: "triangle" },
+                    envelope: { attack: 0.01, decay: 0.3, sustain: 0.1, release: 0.8 }
+                }).toDestination();
+                chimeSynth.volume.value = -16;
+
+                audioInitialized = true;
+            } catch (e) {
+                console.log("Audio setup deferred", e);
+            }
+        }
+
+        function playPeelSound() {
+            if (!state.soundEnabled) return;
+            initAudio();
+            if (synth) {
+                const notes = ["C3", "E3", "G3", "A3"];
+                const randomNote = notes[Math.floor(Math.random() * notes.length)];
+                synth.triggerAttackRelease(randomNote, "16n");
+            }
+        }
+
+        function playChimeSound() {
+            if (!state.soundEnabled) return;
+            initAudio();
+            if (chimeSynth) {
+                chimeSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            }
+        }
+
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (state.soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high';
+                showToast('🔊 Sound Enabled');
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark';
+                showToast('🔇 Sound Muted');
+            }
+        }
+
+        // Calculate Peel Power per click
+        function getPeelPower() {
+            let power = 0;
+            TOOL_DATA.forEach(t => {
+                const count = state.tools[t.id] || 0;
+                power += count * t.power;
+            });
+
+            // Apply Skill Tree multipliers
+            if (state.skills['smooth_slice']) power *= 1.5;
+            if (state.skills['spud_pinnacle']) power *= 3;
+            if (state.recipes['fries']) power *= 1.10;
+
+            return Math.max(1, Math.floor(power));
+        }
+
+        // Calculate Coins Per Peel
+        function getCoinMultiplier() {
+            let mult = 1.0;
+            if (state.skills['root']) mult += 0.10;
+            if (state.skills['butter_glaze']) mult += 1.0;
+            if (state.skills['spud_pinnacle']) mult *= 3;
+            if (state.recipes['mashed']) mult += 0.05;
+            if (state.recipes['hashbrowns']) mult += 0.25;
+            return mult;
+        }
+
+        // Calculate Spud Point Multiplier
+        function getSpudMultiplier() {
+            let mult = 1.0;
+            if (state.skills['sharp_mind']) mult += 0.25;
+            if (state.skills['spud_pinnacle']) mult *= 3;
+            if (state.recipes['gnocchi']) mult += 0.20;
+            return mult;
+        }
+
+        // Calculate Auto Peels Per Second (PPS)
+        function getPeelsPerSecond() {
+            let pps = 0;
+            HELPER_DATA.forEach(h => {
+                const count = state.helpers[h.id] || 0;
+                pps += count * h.pps;
+            });
+
+            // Helper speed bonuses
+            let speedMult = 1.0;
+            if (state.skills['cozy_rhythm']) speedMult += 0.20;
+            if (state.skills['tea_break']) speedMult += 0.30;
+            if (state.skills['grandma_love']) speedMult *= 2.0;
+            if (state.recipes['baked']) speedMult += 0.15;
+
+            pps *= speedMult;
+            return pps;
+        }
+
+        function triggerPeel(event, isAuto = false) {
+            initAudio();
+            
+            const power = getPeelPower();
+            const spudGain = Math.ceil(power * getSpudMultiplier());
+            
+            // Check golden luck
+            let coinLuck = 1;
+            if (state.skills['golden_russet'] && Math.random() < 0.10) {
+                coinLuck = 2;
+            }
+            
+            const coinGain = Math.max(1, Math.floor(power * getCoinMultiplier() * coinLuck));
+
+            // Grant Currencies
+            state.spuds += spudGain;
+            state.lifetimeSpuds += spudGain;
+            state.coins += coinGain;
+            state.lifetimeCoins += coinGain;
+
+            if (!isAuto) {
+                state.totalClicks++;
+                playPeelSound();
+                
+                // Visual bounce on potato
+                const pot = document.getElementById('potato-element');
+                pot.style.transform = 'scale(0.92) rotate(' + (Math.random() * 6 - 3) + 'deg)';
+                setTimeout(() => { pot.style.transform = ''; }, 100);
+
+                // Create float text & peel curl particle at click coordinate
+                createClickParticles(event, `+${spudGain} 🥔`, `+${coinGain} 🪙`);
+            }
+
+            // Potato progress visual update
+            state.potatoProgress += (power * 2);
+            if (state.potatoProgress >= 100) {
+                state.potatoProgress = 0;
+                addLog(`Finished peeling a whole potato! Cozy job! ✨`);
+            }
+            document.getElementById('peel-percent').innerText = Math.floor(state.potatoProgress) + '%';
+
+            updateUI();
+            checkRecipes();
+        }
+
+        // Click / Touch particle creator
+        function createClickParticles(e, spudText, coinText) {
+            const container = document.getElementById('potato-container');
+            const rect = container.getBoundingClientRect();
+            
+            let x = rect.width / 2;
+            let y = rect.height / 2;
+
+            if (e && e.clientX) {
+                x = e.clientX - rect.left;
+                y = e.clientY - rect.top;
+            }
+
+            const layer = document.getElementById('floating-layer');
+
+            // Floating Numbers
+            const floatEl = document.createElement('div');
+            floatEl.className = 'float-text text-amber-900 text-sm font-extrabold flex gap-1 items-center bg-cozy-cream/80 px-2 py-1 rounded-xl shadow-sm border border-wood/30';
+            floatEl.style.left = `${x}px`;
+            floatEl.style.top = `${y - 20}px`;
+            floatEl.innerHTML = `${spudText} <span class="text-amber-600">${coinText}</span>`;
+            layer.appendChild(floatEl);
+
+            // Peel Strip Ribbon Particle
+            const ribbon = document.createElement('div');
+            ribbon.className = 'peel-particle w-6 h-3 bg-spud-skin rounded-full border border-spud-dark shadow-sm';
+            ribbon.style.left = `${x}px`;
+            ribbon.style.top = `${y}px`;
+            
+            const dx = (Math.random() - 0.5) * 120;
+            const dy = -40 - Math.random() * 60;
+            const rot = (Math.random() - 0.5) * 360;
+
+            ribbon.style.setProperty('--tw-translate-x', `${dx}px`);
+            ribbon.style.setProperty('--tw-translate-y', `${dy}px`);
+            ribbon.style.setProperty('--tw-rotate', `${rot}deg`);
+
+            layer.appendChild(ribbon);
+
+            // Cleanup
+            setTimeout(() => { floatEl.remove(); ribbon.remove(); }, 1100);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = 'tab-btn px-4 py-2.5 rounded-t-2xl font-bold text-sm sm:text-base transition-all flex items-center gap-2 bg-cozy-cream/70 text-wood-dark hover:bg-cozy-cream';
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            activeBtn.className = 'tab-btn active px-4 py-2.5 rounded-t-2xl font-bold text-sm sm:text-base transition-all flex items-center gap-2 bg-wood-dark text-white shadow-md';
+
+            if (tabId === 'tree') {
+                renderSkillTree();
+            }
+        }
+
+        function renderShop() {
+            // Render Peeler Tools
+            const toolList = document.getElementById('tool-upgrades-list');
+            toolList.innerHTML = TOOL_DATA.map(tool => {
+                const count = state.tools[tool.id] || 0;
+                const cost = Math.floor(tool.baseCost * Math.pow(1.35, count));
+                const canAfford = state.coins >= cost;
+
+                return `
+                    <div class="bg-cozy-cream border-2 border-wood/40 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-sm hover:border-wood transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-wood-light/50 border border-wood flex items-center justify-center text-amber-800 text-xl font-bold">
+                                <i class="fa-solid ${tool.icon}"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-wood-darker text-sm">${tool.name} <span class="text-xs font-semibold text-stone-500">(Lvl ${count})</span></div>
+                                <div class="text-xs text-stone-500">${tool.desc}</div>
+                                <div class="text-xs text-amber-800 font-bold mt-0.5">+${tool.power} Peel Power per lvl</div>
+                            </div>
+                        </div>
+                        <button onclick="buyTool('${tool.id}')" ${!canAfford ? 'disabled' : ''} class="px-4 py-2.5 rounded-xl font-bold text-xs ${canAfford ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-md btn-bounce' : 'bg-stone-200 text-stone-400 cursor-not-allowed'} transition shrink-0">
+                            Buy (${cost} 🪙)
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            // Render Kitchen Helpers
+            const helperList = document.getElementById('helper-upgrades-list');
+            helperList.innerHTML = HELPER_DATA.map(helper => {
+                const count = state.helpers[helper.id] || 0;
+                const cost = Math.floor(helper.baseCost * Math.pow(1.28, count));
+                const canAfford = state.coins >= cost;
+
+                return `
+                    <div class="bg-cozy-cream border-2 border-wood/40 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-sm hover:border-wood transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-cozy-sage/30 border border-cozy-sage flex items-center justify-center text-emerald-800 text-xl font-bold">
+                                <i class="fa-solid ${helper.icon}"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-wood-darker text-sm">${helper.name} <span class="text-xs font-semibold text-stone-500">(x${count})</span></div>
+                                <div class="text-xs text-stone-500">${helper.desc}</div>
+                                <div class="text-xs text-emerald-800 font-bold mt-0.5">+${helper.pps} Peels/sec each</div>
+                            </div>
+                        </div>
+                        <button onclick="buyHelper('${helper.id}')" ${!canAfford ? 'disabled' : ''} class="px-4 py-2.5 rounded-xl font-bold text-xs ${canAfford ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md btn-bounce' : 'bg-stone-200 text-stone-400 cursor-not-allowed'} transition shrink-0">
+                            Hire (${cost} 🪙)
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function buyTool(id) {
+            const tool = TOOL_DATA.find(t => t.id === id);
+            const count = state.tools[id] || 0;
+            const cost = Math.floor(tool.baseCost * Math.pow(1.35, count));
+
+            if (state.coins >= cost) {
+                state.coins -= cost;
+                state.tools[id] = count + 1;
+                playChimeSound();
+                showToast(`Upgraded ${tool.name}! 🔪`);
+                addLog(`Upgraded tool to ${tool.name} (Lvl ${count + 1})`);
+                updateUI();
+                renderShop();
+            }
+        }
+
+        function buyHelper(id) {
+            const helper = HELPER_DATA.find(h => h.id === id);
+            const count = state.helpers[id] || 0;
+            const cost = Math.floor(helper.baseCost * Math.pow(1.28, count));
+
+            if (state.coins >= cost) {
+                state.coins -= cost;
+                state.helpers[id] = count + 1;
+                playChimeSound();
+                showToast(`Hired ${helper.name}! 🤝`);
+                addLog(`Hired helper: ${helper.name} (Total: ${count + 1})`);
+                updateUI();
+                renderShop();
+            }
+        }
+
+        function renderSkillTree() {
+            const wrapper = document.getElementById('tree-nodes-wrapper');
+            const svg = document.getElementById('tree-svg-lines');
+            wrapper.innerHTML = '';
+            svg.innerHTML = '';
+
+            // Draw Connection Lines
+            SKILL_TREE_NODES.forEach(node => {
+                node.requires.forEach(reqId => {
+                    const parent = SKILL_TREE_NODES.find(n => n.id === reqId);
+                    if (parent) {
+                        const isUnlocked = !!state.skills[node.id];
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', parent.x);
+                        line.setAttribute('y1', parent.y);
+                        line.setAttribute('x2', node.x);
+                        line.setAttribute('y2', node.y);
+                        line.setAttribute('stroke', isUnlocked ? '#8b5a2b' : '#d4c5b3');
+                        line.setAttribute('stroke-width', isUnlocked ? '4' : '2');
+                        line.setAttribute('stroke-dasharray', isUnlocked ? 'none' : '4');
+                        svg.appendChild(line);
+                    }
+                });
+            });
+
+            // Render Nodes
+            SKILL_TREE_NODES.forEach(node => {
+                const isUnlocked = !!state.skills[node.id];
+                const canUnlock = node.requires.length === 0 || node.requires.every(reqId => !!state.skills[reqId]);
+                const canAfford = state.spuds >= node.cost;
+
+                const nodeEl = document.createElement('div');
+                nodeEl.className = `absolute transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all duration-200 border-2 shadow-md group ${
+                    isUnlocked 
+                        ? 'bg-amber-100 border-wood-dark text-wood-darker glow-gold' 
+                        : canUnlock && canAfford 
+                            ? 'bg-cozy-cream border-spud-dark hover:scale-110' 
+                            : 'bg-stone-200 border-stone-300 opacity-60 cursor-not-allowed'
+                }`;
+                nodeEl.style.left = `${node.x}px`;
+                nodeEl.style.top = `${node.y}px`;
+
+                nodeEl.innerHTML = `
+                    <span class="text-2xl">${node.icon}</span>
+                    <span class="text-[10px] font-bold ${isUnlocked ? 'text-amber-900' : 'text-stone-600'}">${isUnlocked ? 'Unlocked' : `${node.cost}🥔`}</span>
+
+                    <!-- Tooltip -->
+                    <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center z-30 pointer-events-none w-48">
+                        <div class="bg-wood-dark text-white text-xs p-2.5 rounded-xl shadow-xl text-center border border-wood-light">
+                            <div class="font-bold text-amber-200">${node.name}</div>
+                            <div class="text-[11px] text-stone-200 mt-0.5">${node.desc}</div>
+                            <div class="text-[10px] text-amber-300 font-bold mt-1">Cost: ${node.cost} Peeled Potatoes</div>
+                        </div>
+                        <div class="w-2 h-2 bg-wood-dark rotate-45 -mt-1"></div>
+                    </div>
+                `;
+
+                if (!isUnlocked && canUnlock) {
+                    nodeEl.onclick = () => buySkill(node);
+                }
+
+                wrapper.appendChild(nodeEl);
+            });
+        }
+
+        function buySkill(node) {
+            if (state.spuds >= node.cost) {
+                state.spuds -= node.cost;
+                state.skills[node.id] = true;
+                playChimeSound();
+                showToast(`Unlocked Skill: ${node.name}! 🌿`);
+                addLog(`Mastered skill: ${node.name}`);
+                updateUI();
+                renderSkillTree();
+            } else {
+                showToast(`Need ${node.cost - state.spuds} more Spud Points! 🥔`);
+            }
+        }
+
+        function checkRecipes() {
+            RECIPES_DATA.forEach(recipe => {
+                if (!state.recipes[recipe.id] && state.lifetimeSpuds >= recipe.milestone) {
+                    state.recipes[recipe.id] = true;
+                    showToast(`Discovered Dish: ${recipe.name}! 🍳`);
+                    addLog(`Discovered recipe: ${recipe.name}!`);
+                    renderRecipes();
+                }
+            });
+        }
+
+        function renderRecipes() {
+            const container = document.getElementById('recipe-list');
+            container.innerHTML = RECIPES_DATA.map(recipe => {
+                const isUnlocked = !!state.recipes[recipe.id];
+
+                return `
+                    <div class="p-4 rounded-2xl border-2 transition ${isUnlocked ? 'bg-amber-50/80 border-amber-300 shadow-sm' : 'bg-stone-100/70 border-stone-200 opacity-60'} flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-white border border-wood/20 flex items-center justify-center text-2xl shrink-0 shadow-inner">
+                            ${isUnlocked ? recipe.icon : '🔒'}
+                        </div>
+                        <div>
+                            <div class="font-bold text-wood-darker text-sm">${recipe.name}</div>
+                            <div class="text-xs text-stone-500">${isUnlocked ? recipe.desc : `Requires ${recipe.milestone} Lifetime Peeled Potatoes`}</div>
+                            <div class="text-xs font-bold text-amber-800 mt-1">${recipe.reward}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateUI() {
+            // Stats Bar
+            document.getElementById('stat-coins').innerText = Math.floor(state.coins).toLocaleString();
+            document.getElementById('stat-spuds').innerText = Math.floor(state.spuds).toLocaleString();
+            document.getElementById('stat-pps').innerText = getPeelsPerSecond().toFixed(1);
+            document.getElementById('stat-peel-power').innerText = `+${getPeelPower()} per peel`;
+
+            // Tab Balance Trackers
+            document.getElementById('shop-coin-balance').innerText = Math.floor(state.coins).toLocaleString();
+            document.getElementById('tree-spud-balance').innerText = Math.floor(state.spuds).toLocaleString();
+
+            // Equipped Tool Name
+            const highestTool = [...TOOL_DATA].reverse().find(t => (state.tools[t.id] || 0) > 0) || TOOL_DATA[0];
+            document.getElementById('equipped-tool-name').innerText = highestTool.name;
+            document.getElementById('equipped-tool-icon').className = `fa-solid ${highestTool.icon}`;
+
+            // Quick Stats
+            document.getElementById('stat-coin-yield').innerText = `${getCoinMultiplier().toFixed(2)}x`;
+            document.getElementById('stat-helper-speed').innerText = `${((state.skills['tea_break'] ? 1.3 : 1.0) * (state.skills['cozy_rhythm'] ? 1.2 : 1.0) * (state.skills['grandma_love'] ? 2.0 : 1.0)).toFixed(1)}x`;
+            document.getElementById('stat-golden-chance').innerText = state.skills['golden_russet'] ? '10%' : '1%';
+            document.getElementById('stat-total-peels').innerText = Math.floor(state.lifetimeSpuds).toLocaleString();
+
+            // Stats Page
+            document.getElementById('stat-rec-clicks').innerText = state.totalClicks.toLocaleString();
+            document.getElementById('stat-rec-spuds').innerText = Math.floor(state.lifetimeSpuds).toLocaleString();
+            document.getElementById('stat-rec-coins').innerText = Math.floor(state.lifetimeCoins).toLocaleString();
+            document.getElementById('stat-rec-skills').innerText = `${Object.keys(state.skills).length} / ${SKILL_TREE_NODES.length}`;
+            document.getElementById('stat-rec-dishes').innerText = `${Object.keys(state.recipes).length} / ${RECIPES_DATA.length}`;
+            
+            const mins = Math.floor(state.playTimeSeconds / 60);
+            const secs = state.playTimeSeconds % 60;
+            document.getElementById('stat-rec-time').innerText = `${mins}m ${secs}s`;
+
+            // Update Cat Companion Chatter based on progress
+            updateCompanionQuote();
+        }
+
+        function updateCompanionQuote() {
+            const quotes = [
+                '"Purr... that peel strip came off in one smooth spiral!"',
+                '"I love sitting near the warm potato basket."',
+                '"Grandma Spud says we make the best potato salad in town."',
+                '"Spud Points can unlock secret heritage skills in the tree tab!"',
+                '"Did you know blue potatoes exist? Cozy spuds for days!"'
+            ];
+            const quoteIndex = Math.floor(state.lifetimeSpuds / 50) % quotes.length;
+            document.getElementById('companion-quote').innerText = quotes[quoteIndex];
+        }
+
+        function addLog(msg) {
+            const log = document.getElementById('kitchen-log');
+            const item = document.createElement('div');
+            item.className = 'text-stone-600 flex items-center gap-1.5';
+            item.innerHTML = `<span class="text-amber-700 font-bold">•</span> ${msg}`;
+            log.prepend(item);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+
+        let isDragging = false;
+        let lastX = 0, lastY = 0;
+
+        function initPotatoInteractions() {
+            const pot = document.getElementById('potato-container');
+
+            pot.addEventListener('click', (e) => triggerPeel(e));
+
+            // Touch / Drag swipe peeling mechanic
+            pot.addEventListener('pointerdown', (e) => {
+                isDragging = true;
+                lastX = e.clientX;
+                lastY = e.clientY;
+            });
+
+            window.addEventListener('pointermove', (e) => {
+                if (!isDragging) return;
+                const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+                if (dist > 35) { // Triggers a peel strip for every swipe drag!
+                    lastX = e.clientX;
+                    lastY = e.clientY;
+                    triggerPeel(e);
+                }
+            });
+
+            window.addEventListener('pointerup', () => { isDragging = false; });
+        }
+
+        function gameLoop() {
+            const pps = getPeelsPerSecond();
+            if (pps > 0) {
+                const autoSpuds = pps / 10;
+                const autoCoins = (pps / 10) * getCoinMultiplier();
+
+                state.spuds += autoSpuds;
+                state.lifetimeSpuds += autoSpuds;
+                state.coins += autoCoins;
+                state.lifetimeCoins += autoCoins;
+
+                state.potatoProgress += (pps / 5);
+                if (state.potatoProgress >= 100) state.potatoProgress = 0;
+                document.getElementById('peel-percent').innerText = Math.floor(state.potatoProgress) + '%';
+
+                updateUI();
+                checkRecipes();
+            }
+        }
+
+        // Timer for time played tracking
+        setInterval(() => {
+            state.playTimeSeconds++;
+            updateUI();
+        }, 1000);
+
+        function saveGame(manual = false) {
+            try {
+                localStorage.setItem('cozy_spud_peeler_save', JSON.stringify(state));
+                if (manual) showToast('💾 Progress Saved!');
+            } catch (e) {
+                console.error("Save failed", e);
+            }
+        }
+
+        function loadGame() {
+            try {
+                const saved = localStorage.getItem('cozy_spud_peeler_save');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state = { ...state, ...parsed };
+                    addLog("Welcome back to your cozy kitchen!");
+                }
+            } catch (e) {
+                console.error("Load failed", e);
+            }
+        }
+
+        function confirmReset() {
+            if (confirm("Are you sure you want to reset your cozy spud progress?")) {
+                localStorage.removeItem('cozy_spud_peeler_save');
+                location.reload();
+            }
+        }
+
+        // Auto Save every 15 seconds
+        setInterval(() => saveGame(false), 15000);
+
+        window.onload = function() {
+            loadGame();
+            initPotatoInteractions();
+            renderShop();
+            renderRecipes();
+            updateUI();
+
+            // Start main game interval (100ms ticks)
+            setInterval(gameLoop, 100);
+        };
+    </script>
+</body>
+</html>
