@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpudGPT - The Potato Chatbot</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        nunito: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        potato: {
+                            50: '#fdfbf7',
+                            100: '#f7f1e3',
+                            200: '#eedfbe',
+                            300: '#e1c690',
+                            400: '#d3a863',
+                            500: '#c28b3f',
+                            600: '#aa6d32',
+                            700: '#8c522b',
+                            800: '#724228',
+                            900: '#5e3724',
+                            950: '#341c12',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #2b1c14;
+            background-image: radial-gradient(#4a3123 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2b1c14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #724228;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #aa6d32;
+        }
+
+        /* Potato bounce animation */
+        @keyframes potatoBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-6px) rotate(-3deg); }
+            75% { transform: translateY(-2px) rotate(3deg); }
+        }
+
+        @keyframes talkMouth {
+            0%, 100% { transform: scaleY(0.2); }
+            50% { transform: scaleY(1.2); }
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .animate-spud {
+            animation: potatoBounce 2s infinite ease-in-out;
+        }
+
+        .talking-mouth {
+            animation: talkMouth 0.15s infinite alternate;
+        }
+
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 50;
+            animation: floatParticle 3s linear forwards;
+        }
+
+        /* Speech bubble arrow */
+        .bubble-left::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 14px;
+            border-style: solid;
+            border-width: 8px 12px 8px 0;
+            border-color: transparent #f7f1e3 transparent transparent;
+        }
+
+        .bubble-right::before {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 14px;
+            border-style: solid;
+            border-width: 8px 0 8px 12px;
+            border-color: transparent transparent transparent #aa6d32;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100 flex flex-col items-center justify-center p-2 sm:p-4">
+
+    <div class="w-full max-w-4xl h-[92vh] flex flex-col md:flex-row gap-4 bg-potato-950/80 backdrop-blur-md border border-potato-800/50 rounded-3xl p-3 sm:p-5 shadow-2xl overflow-hidden">
+        
+        <!-- SIDEBAR: Potato Character & Customization Panel -->
+        <div class="w-full md:w-80 flex flex-col items-center justify-between bg-potato-900/60 border border-potato-800/60 rounded-2xl p-4 shrink-0">
+            
+            <!-- App Header -->
+            <div class="text-center w-full">
+                <div class="flex items-center justify-center gap-2">
+                    <span class="text-2xl">🥔</span>
+                    <h1 class="font-fredoka text-2xl font-bold text-potato-300 tracking-wide">SpudGPT</h1>
+                </div>
+                <p class="text-xs text-potato-400 font-medium mt-0.5">The World's Most Starchy AI</p>
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 mt-2 rounded-full bg-potato-950/80 border border-potato-700/50 text-xs text-emerald-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    100% Baked & Ready
+                </div>
+            </div>
+
+            <!-- Interactive Potato Avatar Container -->
+            <div class="relative my-4 flex flex-col items-center justify-center group cursor-pointer" id="potatoContainer" title="Click to poke Spud!">
+                <!-- Accessory Overlays -->
+                <div id="accessoryContainer" class="absolute -top-6 z-20 pointer-events-none transition-all duration-300">
+                    <!-- Accessory SVGs dynamically injected here -->
+                </div>
+
+                <!-- Main SVG Potato -->
+                <svg id="potatoSvg" class="w-44 h-44 drop-shadow-xl animate-spud transition-transform duration-200 hover:scale-105 active:scale-95" viewBox="0 0 200 200">
+                    <defs>
+                        <radialGradient id="potatoGrad" cx="40%" cy="40%" r="60%">
+                            <stop offset="0%" stop-color="#e1c690" />
+                            <stop offset="70%" stop-color="#c28b3f" />
+                            <stop offset="100%" stop-color="#8c522b" />
+                        </radialGradient>
+                        <radialGradient id="spotGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#724228" stop-opacity="0.4" />
+                            <stop offset="100%" stop-color="#724228" stop-opacity="0" />
+                        </radialGradient>
+                    </defs>
+
+                    <!-- Potato Body -->
+                    <path d="M 50,100 C 40,40 100,20 150,50 C 190,80 180,150 140,175 C 90,195 40,160 50,100 Z" fill="url(#potatoGrad)" stroke="#5e3724" stroke-width="4" />
+                    
+                    <!-- Potato Skin Spots/Eyes -->
+                    <ellipse cx="70" cy="65" rx="8" ry="4" fill="url(#spotGrad)" transform="rotate(-15 70 65)" />
+                    <ellipse cx="145" cy="120" rx="10" ry="5" fill="url(#spotGrad)" transform="rotate(20 145 120)" />
+                    <ellipse cx="85" cy="155" rx="7" ry="3" fill="url(#spotGrad)" transform="rotate(-5 85 155)" />
+
+                    <!-- Eyes -->
+                    <g id="potatoEyes">
+                        <!-- Left Eye -->
+                        <circle cx="80" cy="95" r="9" fill="#1e110a" />
+                        <circle cx="77" cy="92" r="3" fill="#ffffff" />
+                        <!-- Right Eye -->
+                        <circle cx="120" cy="95" r="9" fill="#1e110a" />
+                        <circle cx="117" cy="92" r="3" fill="#ffffff" />
+                    </g>
+
+                    <!-- Blushing Cheeks -->
+                    <ellipse cx="68" cy="108" rx="7" ry="4" fill="#e74c3c" opacity="0.3" />
+                    <ellipse cx="132" cy="108" rx="7" ry="4" fill="#e74c3c" opacity="0.3" />
+
+                    <!-- Mouth -->
+                    <path id="potatoMouth" d="M 90,112 Q 100,122 110,112" fill="none" stroke="#1e110a" stroke-width="3.5" stroke-linecap="round" />
+                </svg>
+
+                <p class="text-[11px] text-potato-400/80 mt-2 font-semibold tracking-wider uppercase">Tap Spud for audio</p>
+            </div>
+
+            <!-- Customization & Settings Controls -->
+            <div class="w-full space-y-3">
+                <div class="bg-potato-950/60 p-3 rounded-xl border border-potato-800/40">
+                    <label class="block text-xs font-bold text-potato-300 uppercase tracking-wider mb-2">Hat Style</label>
+                    <div class="grid grid-cols-4 gap-1.5" id="hatSelector">
+                        <button data-hat="none" class="hat-btn active py-1.5 px-2 text-xs rounded-lg bg-potato-800 hover:bg-potato-700 font-medium text-potato-200 border border-potato-600 transition-all text-center">None</button>
+                        <button data-hat="chef" class="hat-btn py-1.5 px-2 text-xs rounded-lg bg-potato-950 hover:bg-potato-800 font-medium text-potato-300 border border-potato-800/60 transition-all text-center">🧑‍🍳 Chef</button>
+                        <button data-hat="crown" class="hat-btn py-1.5 px-2 text-xs rounded-lg bg-potato-950 hover:bg-potato-800 font-medium text-potato-300 border border-potato-800/60 transition-all text-center">👑 King</button>
+                        <button data-hat="glasses" class="hat-btn py-1.5 px-2 text-xs rounded-lg bg-potato-950 hover:bg-potato-800 font-medium text-potato-300 border border-potato-800/60 transition-all text-center">🕶️ Cool</button>
+                    </div>
+                </div>
+
+                <!-- Stats Counters -->
+                <div class="bg-potato-950/60 p-3 rounded-xl border border-potato-800/40 flex justify-between items-center text-xs">
+                    <span class="text-potato-400">Total "Potatoes" Said:</span>
+                    <span id="potatoCounter" class="font-bold text-potato-300 text-sm font-fredoka">0</span>
+                </div>
+
+                <!-- Sound Toggle -->
+                <div class="flex items-center justify-between bg-potato-950/60 p-3 rounded-xl border border-potato-800/40">
+                    <span class="text-xs font-medium text-potato-300">Sound Effects</span>
+                    <button id="soundToggle" class="relative inline-flex h-6 w-11 items-center rounded-full bg-emerald-600 transition-colors focus:outline-none">
+                        <span id="soundToggleKnob" class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MAIN CHAT INTERFACE -->
+        <div class="flex-1 flex flex-col bg-potato-900/40 border border-potato-800/50 rounded-2xl overflow-hidden">
+            
+            <!-- Chat Header Bar -->
+            <div class="p-3.5 bg-potato-900/80 border-b border-potato-800/60 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-potato-500/20 border border-potato-500/40 flex items-center justify-center text-lg">🥔</div>
+                    <div>
+                        <h2 class="font-fredoka text-sm font-semibold text-potato-200">Conversation with Spud</h2>
+                        <p class="text-[11px] text-potato-400">Speaks 100% pure Potato language</p>
+                    </div>
+                </div>
+                <button id="clearChatBtn" class="text-xs text-potato-400 hover:text-potato-200 bg-potato-950/60 hover:bg-potato-950 px-2.5 py-1.5 rounded-lg border border-potato-800 transition-colors">
+                    Clear Chat
+                </button>
+            </div>
+
+            <!-- Messages Log Container -->
+            <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-4">
+                
+                <!-- Initial Welcome Message from Spud -->
+                <div class="flex items-start gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-potato-600 border border-potato-400 flex items-center justify-center text-sm shrink-0 mt-1 shadow-md">🥔</div>
+                    <div class="relative bg-potato-100 text-potato-950 px-4 py-3 rounded-2xl rounded-tl-none max-w-[85%] shadow-md bubble-left">
+                        <p class="text-sm sm:text-base font-semibold leading-relaxed font-fredoka">Potato! Potato, potato... Potato?</p>
+                        <span class="text-[10px] text-potato-700/70 block mt-1 font-sans">Spud • Just now</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Quick Suggestions Bar -->
+            <div class="px-3 py-2 bg-potato-950/40 border-t border-potato-800/40 flex gap-2 overflow-x-auto text-xs no-scrollbar">
+                <span class="text-potato-500 shrink-0 self-center text-[11px] font-semibold">Quick Prompts:</span>
+                <button class="quick-btn shrink-0 bg-potato-900 hover:bg-potato-800 text-potato-300 border border-potato-700/50 px-2.5 py-1 rounded-full transition-colors">What is the meaning of life?</button>
+                <button class="quick-btn shrink-0 bg-potato-900 hover:bg-potato-800 text-potato-300 border border-potato-700/50 px-2.5 py-1 rounded-full transition-colors">Tell me a joke!</button>
+                <button class="quick-btn shrink-0 bg-potato-900 hover:bg-potato-800 text-potato-300 border border-potato-700/50 px-2.5 py-1 rounded-full transition-colors">Mashed or Fries?</button>
+            </div>
+
+            <!-- Input Form Bar -->
+            <form id="chatForm" class="p-3 bg-potato-950/80 border-t border-potato-800/60 flex items-center gap-2">
+                <input 
+                    type="text" 
+                    id="userInput" 
+                    placeholder="Ask Spud anything... (e.g. How are you?)" 
+                    class="flex-1 bg-potato-900/90 text-potato-100 placeholder-potato-500 border border-potato-700/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-potato-400 focus:ring-1 focus:ring-potato-400 transition-all"
+                    autocomplete="off"
+                    required
+                />
+                <button 
+                    type="submit" 
+                    id="sendBtn"
+                    class="bg-potato-500 hover:bg-potato-400 active:bg-potato-600 text-potato-950 font-bold px-5 py-3 rounded-xl transition-all flex items-center justify-center shadow-lg hover:shadow-potato-500/20 shrink-0"
+                >
+                    <span class="font-fredoka text-sm">Send</span>
+                    <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+
+    <script>
+        // State variables
+        let soundEnabled = true;
+        let totalPotatoCount = 1; // Started with welcome message
+        let isTyping = false;
+        let audioCtx = null;
+
+        // DOM Elements
+        const chatMessages = document.getElementById('chatMessages');
+        const chatForm = document.getElementById('chatForm');
+        const userInput = document.getElementById('userInput');
+        const potatoMouth = document.getElementById('potatoMouth');
+        const potatoSvg = document.getElementById('potatoSvg');
+        const accessoryContainer = document.getElementById('accessoryContainer');
+        const potatoCounter = document.getElementById('potatoCounter');
+        const soundToggle = document.getElementById('soundToggle');
+        const soundToggleKnob = document.getElementById('soundToggleKnob');
+        const clearChatBtn = document.getElementById('clearChatBtn');
+        const hatButtons = document.querySelectorAll('.hat-btn');
+        const quickBtns = document.querySelectorAll('.quick-btn');
+
+        // Accessories SVG Definitions
+        const accessories = {
+            none: '',
+            chef: `<svg class="w-24 h-24 text-white drop-shadow-md" viewBox="0 0 100 100">
+                    <path d="M 25,60 L 75,60 L 70,80 L 30,80 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                    <path d="M 25,60 C 10,50 15,20 35,25 C 40,10 60,10 65,25 C 85,20 90,50 75,60 Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+                   </svg>`,
+            crown: `<svg class="w-20 h-20 drop-shadow-md" viewBox="0 0 100 100">
+                    <polygon points="20,75 25,35 42,55 50,25 58,55 75,35 80,75" fill="#f59e0b" stroke="#b45309" stroke-width="3"/>
+                    <circle cx="25" cy="35" r="4" fill="#ef4444"/>
+                    <circle cx="50" cy="25" r="5" fill="#3b82f6"/>
+                    <circle cx="75" cy="35" r="4" fill="#ef4444"/>
+                   </svg>`,
+            glasses: `<svg class="w-28 h-20 mt-10 drop-shadow-md" viewBox="0 0 100 50">
+                    <rect x="15" y="10" width="30" height="20" rx="4" fill="#0f172a" stroke="#334155" stroke-width="2"/>
+                    <rect x="55" y="10" width="30" height="20" rx="4" fill="#0f172a" stroke="#334155" stroke-width="2"/>
+                    <line x1="45" y1="18" x2="55" y2="18" stroke="#0f172a" stroke-width="4"/>
+                    <line x1="5" y1="15" x2="15" y2="15" stroke="#0f172a" stroke-width="3"/>
+                    <line x1="85" y1="15" x2="95" y2="15" stroke="#0f172a" stroke-width="3"/>
+                   </svg>`
+        };
+
+        function playPotatoSound(pitch = 1) {
+            if (!soundEnabled) return;
+
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                // Cute, bubbly synth voice sound
+                const baseFreq = 220 + (Math.random() * 180);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(baseFreq * pitch, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime((baseFreq * 1.8) * pitch, audioCtx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.09);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } catch (e) {
+                console.error("Audio error:", e);
+            }
+        }
+
+        function generatePotatoText() {
+            // Pick a random style and length
+            const count = Math.floor(Math.random() * 12) + 1; // 1 to 12 potato segments
+            const styles = ['classic', 'stretched', 'syllables', 'shout', 'mixed'];
+            const chosenStyle = styles[Math.floor(Math.random() * styles.length)];
+
+            let words = [];
+
+            for (let i = 0; i < count; i++) {
+                const randVal = Math.random();
+                if (chosenStyle === 'stretched' && randVal > 0.5) {
+                    const os = 'o'.repeat(Math.floor(Math.random() * 5) + 1);
+                    const as = 'a'.repeat(Math.floor(Math.random() * 4) + 1);
+                    words.push(`P${os}t${as}t${os}`);
+                } else if (chosenStyle === 'syllables' && randVal > 0.4) {
+                    words.push('Po-ta-to');
+                } else if (chosenStyle === 'shout' && randVal > 0.3) {
+                    words.push('POTATO');
+                } else {
+                    words.push(i === 0 ? 'Potato' : (Math.random() > 0.7 ? 'potato' : 'Potato'));
+                }
+            }
+
+            // Join with random punctuation
+            let result = words.join(' ');
+            
+            // Capitalize first letter
+            result = result.charAt(0).toUpperCase() + result.slice(1);
+
+            // End punctuation
+            const endPunctuation = ['.', '!', '?', '...', '!!', '?!'];
+            result += endPunctuation[Math.floor(Math.random() * endPunctuation.length)];
+
+            return { text: result, wordCount: count };
+        }
+
+        function addUserMessage(text) {
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const msgHtml = `
+                <div class="flex items-start gap-2.5 justify-end">
+                    <div class="relative bg-potato-600 text-slate-100 px-4 py-3 rounded-2xl rounded-tr-none max-w-[85%] shadow-md bubble-right">
+                        <p class="text-sm sm:text-base leading-relaxed break-words font-medium">${escapeHtml(text)}</p>
+                        <span class="text-[10px] text-potato-200/70 block mt-1 text-right font-sans">You • ${timeStr}</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-potato-800 border border-potato-600 flex items-center justify-center text-sm shrink-0 mt-1 shadow-md">👤</div>
+                </div>
+            `;
+            
+            chatMessages.insertAdjacentHTML('beforeend', msgHtml);
+            scrollToBottom();
+        }
+
+        function createTypingIndicator() {
+            const indicatorId = 'typing-' + Date.now();
+            const html = `
+                <div id="${indicatorId}" class="flex items-start gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-potato-600 border border-potato-400 flex items-center justify-center text-sm shrink-0 mt-1 shadow-md">🥔</div>
+                    <div class="relative bg-potato-100 text-potato-950 px-4 py-3 rounded-2xl rounded-tl-none shadow-md bubble-left flex items-center gap-1.5">
+                        <span class="text-xs font-semibold text-potato-800 mr-1 font-fredoka">Spud is thinking</span>
+                        <span class="w-2 h-2 bg-potato-600 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                        <span class="w-2 h-2 bg-potato-600 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                        <span class="w-2 h-2 bg-potato-600 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+                    </div>
+                </div>
+            `;
+            chatMessages.insertAdjacentHTML('beforeend', html);
+            scrollToBottom();
+            return indicatorId;
+        }
+
+        function sendPotatoResponse() {
+            if (isTyping) return;
+            isTyping = true;
+
+            const indicatorId = createTypingIndicator();
+            const delay = Math.floor(Math.random() * 600) + 400; // Realistic delay
+
+            setTimeout(() => {
+                // Remove typing indicator
+                const indicatorEl = document.getElementById(indicatorId);
+                if (indicatorEl) indicatorEl.remove();
+
+                const { text, wordCount } = generatePotatoText();
+                totalPotatoCount += wordCount;
+                potatoCounter.textContent = totalPotatoCount;
+
+                const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                // Create response message bubble
+                const msgId = 'msg-' + Date.now();
+                const msgHtml = `
+                    <div class="flex items-start gap-2.5">
+                        <div class="w-8 h-8 rounded-full bg-potato-600 border border-potato-400 flex items-center justify-center text-sm shrink-0 mt-1 shadow-md">🥔</div>
+                        <div class="relative bg-potato-100 text-potato-950 px-4 py-3 rounded-2xl rounded-tl-none max-w-[85%] shadow-md bubble-left">
+                            <p id="${msgId}" class="text-sm sm:text-base font-semibold leading-relaxed font-fredoka min-h-[24px]"></p>
+                            <span class="text-[10px] text-potato-700/70 block mt-1 font-sans">Spud • ${timeStr}</span>
+                        </div>
+                    </div>
+                `;
+                chatMessages.insertAdjacentHTML('beforeend', msgHtml);
+
+                const pTarget = document.getElementById(msgId);
+                
+                // Typewriter effect with sound and mouth animation
+                let charIdx = 0;
+                potatoMouth.classList.add('talking-mouth');
+
+                const typeInterval = setInterval(() => {
+                    if (charIdx < text.length) {
+                        pTarget.textContent += text.charAt(charIdx);
+                        
+                        // Trigger sound on characters (not spaces)
+                        if (text.charAt(charIdx) !== ' ') {
+                            playPotatoSound(1 + (Math.random() * 0.4 - 0.2));
+                        }
+
+                        charIdx++;
+                        scrollToBottom();
+                    } else {
+                        clearInterval(typeInterval);
+                        potatoMouth.classList.remove('talking-mouth');
+                        isTyping = false;
+                        userInput.focus();
+                    }
+                }, 40);
+
+            }, delay);
+        }
+
+        // Helpers
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function escapeHtml(string) {
+            const div = document.createElement('div');
+            div.innerText = string;
+            return div.innerHTML;
+        }
+
+        // Event Listeners
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = userInput.value.trim();
+            if (!text || isTyping) return;
+
+            addUserMessage(text);
+            userInput.value = '';
+            sendPotatoResponse();
+        });
+
+        // Quick Suggestion Buttons
+        quickBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (isTyping) return;
+                userInput.value = btn.textContent;
+                chatForm.dispatchEvent(new Event('submit'));
+            });
+        });
+
+        // Hat Accessories Switcher
+        hatButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                hatButtons.forEach(b => {
+                    b.classList.remove('active', 'bg-potato-800', 'text-potato-200', 'border-potato-600');
+                    b.classList.add('bg-potato-950', 'text-potato-300', 'border-potato-800/60');
+                });
+                btn.classList.add('active', 'bg-potato-800', 'text-potato-200', 'border-potato-600');
+                btn.classList.remove('bg-potato-950', 'text-potato-300', 'border-potato-800/60');
+
+                const hatType = btn.getAttribute('data-hat');
+                accessoryContainer.innerHTML = accessories[hatType] || '';
+                playPotatoSound(1.5);
+            });
+        });
+
+        // Toggle Sound
+        soundToggle.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            if (soundEnabled) {
+                soundToggle.classList.replace('bg-potato-800', 'bg-emerald-600');
+                soundToggleKnob.classList.replace('translate-x-1', 'translate-x-6');
+                playPotatoSound(1.2);
+            } else {
+                soundToggle.classList.replace('bg-emerald-600', 'bg-potato-800');
+                soundToggleKnob.classList.replace('translate-x-6', 'translate-x-1');
+            }
+        });
+
+        // Clear Chat
+        clearChatBtn.addEventListener('click', () => {
+            chatMessages.innerHTML = `
+                <div class="flex items-start gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-potato-600 border border-potato-400 flex items-center justify-center text-sm shrink-0 mt-1 shadow-md">🥔</div>
+                    <div class="relative bg-potato-100 text-potato-950 px-4 py-3 rounded-2xl rounded-tl-none max-w-[85%] shadow-md bubble-left">
+                        <p class="text-sm sm:text-base font-semibold leading-relaxed font-fredoka">Potato! (Chat cleared!)</p>
+                        <span class="text-[10px] text-potato-700/70 block mt-1 font-sans">Spud • Just now</span>
+                    </div>
+                </div>
+            `;
+            playPotatoSound(0.8);
+        });
+
+        // Click on Potato Avatar for Easter Egg floating particle
+        document.getElementById('potatoContainer').addEventListener('click', (e) => {
+            playPotatoSound(1.8);
+
+            // Wiggle animation
+            potatoSvg.classList.remove('animate-spud');
+            potatoSvg.style.transform = 'scale(1.15) rotate(10deg)';
+            setTimeout(() => {
+                potatoSvg.style.transform = '';
+                potatoSvg.classList.add('animate-spud');
+            }, 200);
+
+            // Spawn floating potato emoji
+            const particle = document.createElement('div');
+            particle.className = 'particle text-2xl';
+            particle.textContent = ['🥔', '🍟', '✨', '🥔'][Math.floor(Math.random() * 4)];
+            particle.style.left = e.clientX + 'px';
+            particle.style.top = e.clientY + 'px';
+            document.body.appendChild(particle);
+
+            setTimeout(() => particle.remove(), 3000);
+        });
+    </script>
+</body>
+</html>
